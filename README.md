@@ -1,10 +1,10 @@
-# Agda-LLS
-An Implementation of Various Linear Logics in Agda
+# An Implementation of Various Linear Logics in Agda (ALL)
+
 
 Design
 ------
 
-The design of Agda-LLS is based the following:
+The design of ALL is based the following:
 
   - Haskell Frontend:     
      - Repl:
