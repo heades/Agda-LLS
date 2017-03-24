@@ -1,6 +1,5 @@
 # An Implementation of Various Linear Logics in Agda (ALL)
 
-
 Design
 ------
 
@@ -15,7 +14,9 @@ The design of ALL is based the following:
        - Parsec
      - Type Checker
      - Evaluator
-     - Formal verification
+     - Formal verification:
+       - Dialectica categories
+       - Petri nets
      - Pretty Printer
 
 The Agda backend will be a "server" that will take in various
