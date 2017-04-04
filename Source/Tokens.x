@@ -1,5 +1,5 @@
 {
-module Tokens (getTokens) where
+module Tokens (Token(..), getTokens) where
 }
 
 %wrapper "basic"

@@ -7,15 +7,13 @@ module Interface (ITerm(..),
                   
 import TypeSyntax
                   
-                  
-data ITerm = 
-        Var String                      |
-        Triv                            |
-        Void                            |
-        Tensr ITerm ITerm               |
-        Par ITerm ITerm                 |
-        Lam String Type ITerm           |
-        Let ITerm Type IPattern ITerm    
+data ITerm = Var String
+           | Triv
+           | Void
+           | Tensr ITerm ITerm
+           | Par ITerm ITerm
+           | Lam String Type ITerm
+           | Let ITerm Type IPattern ITerm    
         deriving Show
         
 data IPattern = 
