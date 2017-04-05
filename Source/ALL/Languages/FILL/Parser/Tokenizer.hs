@@ -20,6 +20,15 @@ constParser t = satisfy p <?> show t
 triv :: Monad m => ParsecT [Token] u m ()
 triv = constParser Triv
 
+inT :: Monad m => ParsecT [Token] u m ()
+inT = constParser In
+
+be :: Monad m => ParsecT [Token] u m ()
+be = constParser Be
+
+lamT :: Monad m => ParsecT [Token] u m ()
+lamT = constParser LamT
+      
 void :: Monad m => ParsecT [Token] u m ()
 void = constParser Void
 

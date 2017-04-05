@@ -6,20 +6,24 @@ module Languages.FILL.Parser.Token (ALLTok(..), Token(..), getTokens, AlexPosn(.
 
 $digit = 0-9      
 $alpha = [a-zA-Z] 
+@var = $alpha [$alpha $digit \_ \']*
 
 tokens :-
   $white+                       ;
   "--".*                        ;
-  let                           { \p _ -> (Let, p)         }
-  [\=\+\-\*\/\(\)]              { \p s -> (Sym (head s),p) }
-  $alpha [$alpha $digit \_ \']* { \p s -> (Var s,p)        }
-  "-o"                          { \p _ -> (LinImp, p)      }
-  "(x)"                         { \p _ -> (Tensor, p)      }
-  "(+)"                         { \p _ -> (Par, p)         }
-  "False"                       { \p _ -> (Bottom, p)      }
-  "True"                        { \p _ -> (Top, p)         }
-  "Triv"                        { \p _ -> (Triv, p)        }
-  "void"                        { \p _ -> (Void, p)        }
+  let                           { \p _ -> (Let, p)           }
+  in                            { \p _ -> (In, p)            }
+  be                            { \p _ -> (Be, p)            }
+  [\\]                          { \p s -> (LamT, p)          }
+  [\=\+\-\*\/\(\)\.:]           { \p s -> (Sym (head s), p)  }
+  @var                          { \p s -> (Var s,p)          }
+  "-o"                          { \p _ -> (LinImp, p)        }
+  "(x)"                         { \p _ -> (Tensor, p)        }
+  "(+)"                         { \p _ -> (Par, p)           }
+  "False"                       { \p _ -> (Bottom, p)        }
+  "True"                        { \p _ -> (Top, p)           }
+  "Triv"                        { \p _ -> (Triv, p)          }
+  "void"                        { \p _ -> (Void, p)          }
 {
 -- Each right-hand side has type :: String -> Token
 -- The token type:
@@ -30,7 +34,10 @@ data ALLTok = Par
             | Bottom 
             | Top 
             | Void 
-            | Let 
+            | Let
+            | In
+            | Be
+            | LamT
             | Sym Char 
             | Var String
     deriving (Eq,Show)
