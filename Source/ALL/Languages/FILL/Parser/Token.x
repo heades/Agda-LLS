@@ -1,47 +1,45 @@
 {
-module Languages.FILL.Parser.Token (Token(..), getTokens) where
+module Languages.FILL.Parser.Token (ALLTok(..), Token(..), getTokens, AlexPosn(..)) where
 }
 
-%wrapper "basic"
+%wrapper "posn"
 
-$digit = 0-9            -- digits
-$alpha = [a-zA-Z]       -- alphabetic characters
+$digit = 0-9      
+$alpha = [a-zA-Z] 
 
 tokens :-
-
-  $white+               ;
-  "--".*                { \s -> Comment }
-  let                   { \s -> Let }
-  $digit+               { \s -> Int (read s) }
-  [\=\+\-\*\/\(\)]      { \s -> Sym (head s) }
-  $alpha [$alpha $digit \_ \']*     { \s -> Var s }
-  "-o"                  { \s -> LinImp }
-  "(x)"                 { \s -> Tnsr }
-  "(+)"                 { \s -> Par }
-  "False"               { \s -> Bttm }
-  "True"                { \s -> Top }
-  "Triv"                { \s -> Triv }
-  "o"                   { \s -> Void }
+  $white+                       ;
+  "--".*                        ;
+  let                           { \p _ -> (Let, p)         }
+  [\=\+\-\*\/\(\)]              { \p s -> (Sym (head s),p) }
+  $alpha [$alpha $digit \_ \']* { \p s -> (Var s,p)        }
+  "-o"                          { \p _ -> (LinImp, p)      }
+  "(x)"                         { \p _ -> (Tensor, p)      }
+  "(+)"                         { \p _ -> (Par, p)         }
+  "False"                       { \p _ -> (Bottom, p)      }
+  "True"                        { \p _ -> (Top, p)         }
+  "Triv"                        { \p _ -> (Triv, p)        }
+  "void"                        { \p _ -> (Void, p)        }
 {
 -- Each right-hand side has type :: String -> Token
 -- The token type:
-data Token =
-    White       |
-    Comment     |
-    Par         |
-    Tnsr        |
-    LinImp      |
-    Triv        |
-    Bttm        |
-    Top         |
-    Void        |
-    Let         |
-    Sym Char    |
-    Var String  |
-    Int Int     |
-    Err 
+data ALLTok = Par
+            | Tensor
+            | LinImp 
+            | Triv 
+            | Bottom 
+            | Top 
+            | Void 
+            | Let 
+            | Sym Char 
+            | Var String
     deriving (Eq,Show)
+
+type Token = (ALLTok, AlexPosn)
     
+position :: Token -> AlexPosn
+position = snd
+
 getTokens :: String -> [Token]
 getTokens str = alexScanTokens str
 }
