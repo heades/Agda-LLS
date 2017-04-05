@@ -10,16 +10,16 @@ import Languages.FILL.TypeSyntax
 data ITerm = Var String
            | Triv
            | Void
-           | Tensr ITerm ITerm
-           | Par ITerm ITerm
+           | TTensor ITerm ITerm
+           | TPar ITerm ITerm
            | Lam String Type ITerm
            | Let ITerm Type IPattern ITerm    
-        deriving Show
+ deriving Show
         
 data IPattern = PTriv
               | Block
               | PVar String
-              | PTensr  IPattern IPattern
+              | PTensor  IPattern IPattern
               | PPar    IPattern IPattern   
-        deriving Show
+ deriving Show
         

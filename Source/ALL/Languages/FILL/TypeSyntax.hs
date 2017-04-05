@@ -7,5 +7,9 @@ LANGUAGE
 #-}
 module Languages.FILL.TypeSyntax where
 
-data Type = FillMeIn         
- deriving Show
+data Type = Top
+          | Bottom
+          | Imp Type Type
+          | Tensor Type Type
+          | Par Type Type
+ deriving (Show, Eq)

@@ -1,2 +1,6 @@
 \\.\\#.*
 /Source/ALL/Languages/FILL/Parser/Token.hs
+#.*
+\\#.*
+/Source/ALL/Languages/FILL/#TypeSyntax.hs#
+/Source/ALL/Languages/FILL/.#TypeSyntax.hs
