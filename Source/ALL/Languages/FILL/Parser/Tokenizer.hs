@@ -25,9 +25,6 @@ inT = constParser In
 
 be :: Monad m => ParsecT [Token] u m ()
 be = constParser Be
-
-lamT :: Monad m => ParsecT [Token] u m ()
-lamT = constParser LamT
       
 void :: Monad m => ParsecT [Token] u m ()
 void = constParser Void
