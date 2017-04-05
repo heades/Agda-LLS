@@ -18,19 +18,13 @@ import qualified Languages.FILL.Parser.Tokenizer as Tok
 
 constParser p c = p >> return c
 
-binaryOp p b op = do
-  x <- p
-  b
-  y <- p
-  return $ op x y
-
 binOp assoc op f = Text.Parsec.Expr.Infix (do{ op;return f}) assoc
 
-typeTable = [[binOp AssocNone  tensorParser (\d r -> Tensor d r)],
-             [binOp AssocNone  parParser (\d r -> Par d r)],           
-             [binOp AssocRight impParser (\d r -> Imp d r)]]
-
 typeParser = buildExpressionParser typeTable typeParser'
+ where
+   typeTable = [[binOp AssocNone  tensorParser (\d r -> Tensor d r)],
+                [binOp AssocNone  parParser (\d r -> Par d r)],           
+                [binOp AssocRight impParser (\d r -> Imp d r)]]
 typeParser' = try (Tok.parens typeParser) <|> topParser <|> bottomParser
 
 impParser = constParser Tok.linImp Imp
@@ -39,24 +33,25 @@ parParser = constParser Tok.par Par
 topParser = constParser Tok.top Top
 bottomParser = constParser Tok.bottom Bottom
 
-patternTable = [[binOp AssocNone  ptensorParser (\d r -> PTensor d r)],
-                [binOp AssocNone  pparParser (\d r -> PPar d r)]]   
-
 patternParser = buildExpressionParser patternTable patternParser'
+ where
+   patternTable = [[binOp AssocNone  ptensorParser (\d r -> PTensor d r)],
+                   [binOp AssocNone  pparParser (\d r -> PPar d r)]]   
+
 patternParser' = try (Tok.parens patternParser) <|> blockParser <|> trivParser
 
 blockParser = constParser (Tok.symbol '-') Block
 trivParser = constParser (Tok.triv) PTriv
 ptensorParser = constParser Tok.tensor PTensor
-pparParser = constParser Tok.par PPar
-                
-expr' = try (Tok.parens expr) <|> lamParser <|> letParser <|> voidParser <|> varParser 
+pparParser = constParser Tok.par PPar               
 
 expr = buildExpressionParser tOpTable expr'
  where
    tOpTable = [[binOp AssocNone  ttensorParser (\d r -> TTensor d r)],
                [binOp AssocNone  tparParser (\d r -> TPar d r)]]   
 
+expr' = try (Tok.parens expr) <|> lamParser <|> letParser <|> voidParser <|> varParser 
+              
 ttensorParser = constParser Tok.tensor TTensor
 tparParser = constParser Tok.par TPar
 
