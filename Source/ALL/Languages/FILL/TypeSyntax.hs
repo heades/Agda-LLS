@@ -7,7 +7,8 @@ LANGUAGE
 #-}
 module Languages.FILL.TypeSyntax where
 
-data Type = Top
+data Type = TVar String
+          | Top          
           | Bottom
           | Imp Type Type
           | Tensor Type Type

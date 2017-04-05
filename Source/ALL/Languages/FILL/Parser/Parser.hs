@@ -19,8 +19,11 @@ typeParser = buildExpressionParser typeTable typeParser'
    typeTable = [[binOp AssocNone  tensorParser (\d r -> Tensor d r)],
                 [binOp AssocNone  parParser (\d r -> Par d r)],           
                 [binOp AssocRight impParser (\d r -> Imp d r)]]
-typeParser' = try (Tok.parens typeParser) <|> topParser <|> bottomParser
+typeParser' = try (Tok.parens typeParser) <|> topParser <|> bottomParser <|> tyvarParser
 
+tyvarParser = do
+  x <- Tok.var
+  return $ TVar x
 impParser = constParser Tok.linImp Imp
 tensorParser = constParser Tok.tensor Tensor
 parParser = constParser Tok.par Par
