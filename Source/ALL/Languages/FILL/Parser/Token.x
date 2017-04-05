@@ -20,7 +20,7 @@ tokens :-
   "(+)"                         { \p _ -> (Par, p)           }
   "False"                       { \p _ -> (Bottom, p)        }
   "True"                        { \p _ -> (Top, p)           }
-  "Triv"                        { \p _ -> (Triv, p)          }
+  "triv"                        { \p _ -> (Triv, p)          }
   "void"                        { \p _ -> (Void, p)          }
   @var                          { \p s -> (Var s,p)          }
 {
