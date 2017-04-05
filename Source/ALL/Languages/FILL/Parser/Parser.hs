@@ -6,7 +6,7 @@ LANGUAGE
   FlexibleContexts 
 #-}
 
-module Parser where
+module Languages.FILL.Parser.Parser where
 
 import Prelude
 import Data.List
@@ -22,12 +22,8 @@ import Text.Parsec.Extra
 import System.FilePath
 import System.Directory
 
-
-import Tokens
-import Interface
-import Queue
+import Languages.FILL.Interface
 
 type Parser a = Parsec [Token] a
 type ParserT u m a = ParsecT [Token] u m a    
 
-symbol (Sym a) = 

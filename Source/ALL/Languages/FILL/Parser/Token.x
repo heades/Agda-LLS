@@ -1,5 +1,5 @@
 {
-module Tokens (Token(..), getTokens) where
+module Languages.FILL.Parser.Token (Token(..), getTokens) where
 }
 
 %wrapper "basic"
@@ -13,7 +13,7 @@ tokens :-
   "--".*                { \s -> Comment }
   let                   { \s -> Let }
   $digit+               { \s -> Int (read s) }
-  [\=\+\-\*\/\(\)]          { \s -> Sym (head s) }
+  [\=\+\-\*\/\(\)]      { \s -> Sym (head s) }
   $alpha [$alpha $digit \_ \']*     { \s -> Var s }
   "-o"                  { \s -> LinImp }
   "(x)"                 { \s -> Tnsr }
