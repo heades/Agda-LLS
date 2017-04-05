@@ -15,7 +15,6 @@ tokens :-
   in                            { \p _ -> (In, p)            }
   be                            { \p _ -> (Be, p)            }
   [\=\+\-\*\/\(\)\.:\\]         { \p s -> (Sym (head s), p)  }
-  @var                          { \p s -> (Var s,p)          }
   "-o"                          { \p _ -> (LinImp, p)        }
   "(x)"                         { \p _ -> (Tensor, p)        }
   "(+)"                         { \p _ -> (Par, p)           }
@@ -23,6 +22,7 @@ tokens :-
   "True"                        { \p _ -> (Top, p)           }
   "Triv"                        { \p _ -> (Triv, p)          }
   "void"                        { \p _ -> (Void, p)          }
+  @var                          { \p s -> (Var s,p)          }
 {
 -- Each right-hand side has type :: String -> Token
 -- The token type:

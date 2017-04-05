@@ -1,10 +1,4 @@
-{-# 
-LANGUAGE 
-  NoMonomorphismRestriction, 
-  PackageImports, 
-  TemplateHaskell, 
-  FlexibleContexts 
-#-}
+{-# LANGUAGE NoMonomorphismRestriction #-}
 
 module Languages.FILL.Parser.Parser where
 
