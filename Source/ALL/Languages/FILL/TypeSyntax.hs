@@ -5,7 +5,7 @@ LANGUAGE
   MultiParamTypeClasses, 
   UndecidableInstances 
 #-}
-module TypeSyntax where
+module Languages.FILL.TypeSyntax where
 
 data Type = FillMeIn         
  deriving Show

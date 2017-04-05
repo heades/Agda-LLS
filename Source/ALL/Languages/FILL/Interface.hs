@@ -2,11 +2,11 @@
 -- Haskell front end to the Agda back end.  Both sides must
 -- implement these data types.
 
-module Interface (ITerm(..),
-                  IPattern(..)) where
+module Languages.FILL.Interface (ITerm(..),
+                                 IPattern(..)) where
                   
-import TypeSyntax
-                  
+import Languages.FILL.TypeSyntax
+
 data ITerm = Var String
            | Triv
            | Void
@@ -16,11 +16,10 @@ data ITerm = Var String
            | Let ITerm Type IPattern ITerm    
         deriving Show
         
-data IPattern = 
-        PTriv                        |
-        Block                       |
-        PVar String                  |
-        PTensr  IPattern IPattern   |
-        PPar    IPattern IPattern   
+data IPattern = PTriv
+              | Block
+              | PVar String
+              | PTensr  IPattern IPattern
+              | PPar    IPattern IPattern   
         deriving Show
         

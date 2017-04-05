@@ -8,7 +8,7 @@
 -- combinator over queues to make complex function definitions easier.  --
 --------------------------------------------------------------------------
 
-module Queue where
+module Utils.Queue where
 
 data Queue a = Queue [a] [a]
 
