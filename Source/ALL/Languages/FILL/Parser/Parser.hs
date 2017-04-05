@@ -23,7 +23,18 @@ import System.FilePath
 import System.Directory
 
 import Languages.FILL.Interface
+import Languages.FILL.Parser.Token    
+import Languages.FILL.Parser.Tokenizer
 
-type Parser a = Parsec [Token] a
-type ParserT u m a = ParsecT [Token] u m a    
+expr = parens expr' <|> expr'
+expr' = letParser
+
+letParser = do
+  leT
+  v <- var
+  be
+  p <- var
+  inT
+  b <- var
+  return (v,p,b)
 
