@@ -1,7 +1,5 @@
 {-# LANGUAGE NoMonomorphismRestriction #-}
 
--- Fixme: Need to add parsing function applications.
-
 module Languages.FILL.Parser.Parser where
 
 import Prelude hiding (True)
@@ -55,12 +53,16 @@ expr = buildExpressionParser tOpTable expr'
  where
    tOpTable = [[binOp AssocNone  ttensorParser (\d r -> TTensor d r)],
                [binOp AssocNone  tparParser (\d r -> TPar d r)]]   
-
-expr' = try (Tok.parens expr) <|> lamParser <|> letParser <|> voidParser <|> varParser 
+aterm = try (Tok.parens expr) <|> voidParser <|> varParser 
+expr' = lamParser <|> letParser <|> appParser
               
 ttensorParser = constParser Tok.tensor TTensor
 tparParser = constParser Tok.par TPar
 
+appParser = do
+  t <- many aterm
+  return $ foldl1 App t
+             
 -- Fixme: Only accepted uncapitalized variables.
 -- Fixme: Check for reserved words. 
 varParser = do

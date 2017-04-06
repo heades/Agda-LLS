@@ -13,7 +13,8 @@ data ITerm = Var String
            | TTensor ITerm ITerm
            | TPar ITerm ITerm
            | Lam String Type ITerm
-           | Let ITerm Type IPattern ITerm    
+           | Let ITerm Type IPattern ITerm
+           | App ITerm ITerm
  deriving Show
         
 data IPattern = PTriv
