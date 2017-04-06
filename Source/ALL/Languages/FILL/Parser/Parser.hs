@@ -3,6 +3,7 @@
 module Languages.FILL.Parser.Parser where
 
 import Prelude hiding (True)
+import Data.Char
 import Text.Parsec hiding (Empty)
 import Text.Parsec.Expr
 
@@ -14,6 +15,8 @@ constParser p c = p >> return c
 
 binOp assoc op f = Text.Parsec.Expr.Infix (do{ op;return f}) assoc
 
+reservedWords = ["Top", "Bottom", "let", "in", "be", "void", "triv"]
+                                                           
 typeParser = buildExpressionParser typeTable typeParser'
  where
    typeTable = [[binOp AssocNone  tensorParser (\d r -> Tensor d r)],
@@ -21,11 +24,13 @@ typeParser = buildExpressionParser typeTable typeParser'
                 [binOp AssocRight impParser (\d r -> Imp d r)]]
 typeParser' = try (Tok.parens typeParser) <|> topParser <|> bottomParser <|> tyvarParser
 
--- Fixme: Only accept capitalized variables.
--- Fixme: Check for reserved words. 
 tyvarParser = do
   x <- Tok.var
-  return $ TVar x
+  if isLower $ head x
+  then fail "Type variables must begin with an uppercase letter."
+  else if x `elem` reservedWords
+       then fail $ x ++ " is a reserved word."
+       else return $ TVar x
 
 impParser = constParser Tok.linImp Imp
 tensorParser = constParser Tok.tensor Tensor
@@ -39,11 +44,13 @@ patternParser = buildExpressionParser patternTable patternParser'
                    [binOp AssocNone  pparParser (\d r -> PPar d r)]]   
 patternParser' = try (Tok.parens patternParser) <|> try blockParser <|> trivParser <|> pvarParser
 
--- Fixme: Only accepted uncapitalized variables.
--- Fixme: Check for reserved words. 
 pvarParser = do
   x <- Tok.var
-  return $ PVar x
+  if isUpper $ head x
+  then fail "Pattern variables must begin with a lowercase letter."
+  else if x `elem` reservedWords
+       then fail $ x ++ " is a reserved word."
+       else return $ PVar x       
 blockParser = constParser (Tok.symbol '-') Block
 trivParser = constParser (Tok.triv) PTriv
 ptensorParser = constParser Tok.tensor PTensor
@@ -59,15 +66,19 @@ expr' = lamParser <|> letParser <|> appParser
 ttensorParser = constParser Tok.tensor TTensor
 tparParser = constParser Tok.par TPar
 
-appParser = do
+appParser = do  
   t <- many aterm
-  return $ foldl1 App t
+  case t of
+    [] -> fail "Empty application is not supported: must supply a term."
+    _ -> return $ foldl1 App t
              
--- Fixme: Only accepted uncapitalized variables.
--- Fixme: Check for reserved words. 
 varParser = do
   x <- Tok.var
-  return $ Var x
+  if isUpper $ head x
+  then fail "Pattern variables must begin with a lowercase letter."
+  else if x `elem` reservedWords
+       then fail $ x ++ " is a reserved word."
+       else return $ Var x
 
 voidParser = constParser Tok.void Void             
              
