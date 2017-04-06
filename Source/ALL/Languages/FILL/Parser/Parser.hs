@@ -75,7 +75,7 @@ appParser = do
 varParser = do
   x <- Tok.var
   if isUpper $ head x
-  then fail "Pattern variables must begin with a lowercase letter."
+  then fail "Variables must begin with a lowercase letter."
   else if x `elem` reservedWords
        then fail $ x ++ " is a reserved word."
        else return $ Var x
