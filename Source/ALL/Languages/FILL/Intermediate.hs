@@ -2,8 +2,8 @@
 -- Haskell front end to the Agda back end.  Both sides must
 -- implement these data types.
 
-module Languages.FILL.Interface (ITerm(..),
-                                 IPattern(..)) where
+module Languages.FILL.Intermediate (ITerm(..),
+                                    IPattern(..)) where
                   
 import Languages.FILL.TypeSyntax
 

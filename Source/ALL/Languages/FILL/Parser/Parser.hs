@@ -8,7 +8,7 @@ import Text.Parsec hiding (Empty)
 import Text.Parsec.Expr
 
 import Languages.FILL.TypeSyntax
-import Languages.FILL.Interface
+import Languages.FILL.Intermediate
 import qualified Languages.FILL.Parser.Tokenizer as Tok
 
 constParser p c = p >> return c
