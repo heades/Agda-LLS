@@ -12,4 +12,10 @@ data Type : Set where
   Tensor : Type → Type → Type
   Par : Type → Type → Type
 
-{-# COMPILED_DATA Type Type TVar Top Bottom Imp Tensor Par #-}
+{-# COMPILED_DATA Type Languages.FILL.TypeSyntax.Type 
+                       Languages.FILL.TypeSyntax.TVar 
+                       Languages.FILL.TypeSyntax.Top 
+                       Languages.FILL.TypeSyntax.Bottom 
+                       Languages.FILL.TypeSyntax.Imp 
+                       Languages.FILL.TypeSyntax.Tensor 
+                       Languages.FILL.TypeSyntax.Par #-}

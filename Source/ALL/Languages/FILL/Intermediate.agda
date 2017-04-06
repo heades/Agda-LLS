@@ -11,7 +11,12 @@ data IPattern : Set where
   PVar : String -> IPattern
   PTensor : IPattern -> IPattern -> IPattern
   PPar : IPattern -> IPattern -> IPattern
-{-# COMPILED_DATA IPattern IPattern PTriv Block PVar PTensor PPar #-}
+{-# COMPILED_DATA IPattern Languages.FILL.Intermediate.IPattern 
+                           Languages.FILL.Intermediate.PTriv 
+                           Languages.FILL.Intermediate.Block 
+                           Languages.FILL.Intermediate.PVar 
+                           Languages.FILL.Intermediate.PTensor 
+                           Languages.FILL.Intermediate.PPar #-}
 
 data ITerm : Set where
   Triv : ITerm
@@ -21,5 +26,11 @@ data ITerm : Set where
   Lam : String -> Type -> ITerm -> ITerm
   Let : ITerm -> Type -> IPattern -> ITerm -> ITerm
   App : ITerm -> ITerm -> ITerm
-{-# COMPILED_DATA ITerm ITerm Triv Void TTensor TPar Lam Let App #-}
-
+{-# COMPILED_DATA ITerm Languages.FILL.Intermediate.ITerm 
+                        Languages.FILL.Intermediate.Triv 
+                        Languages.FILL.Intermediate.Void 
+                        Languages.FILL.Intermediate.TTensor 
+                        Languages.FILL.Intermediate.TPar 
+                        Languages.FILL.Intermediate.Lam 
+                        Languages.FILL.Intermediate.Let 
+                        Languages.FILL.Intermediate.App #-}
