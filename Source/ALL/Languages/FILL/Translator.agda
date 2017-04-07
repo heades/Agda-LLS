@@ -3,31 +3,16 @@ module Languages.FILL.Translator where
 open import nat
 
 open import Utils.HaskellTypes
+open import Utils.Exception
 open import Languages.FILL.Intermediate
 open import Languages.FILL.Syntax
 
-data Either (A : Set) (B : Set) : Set where
-  Left : A → Either A B
-  Right : B → Either A B
-{-# COMPILED_DATA Either Either Left Right #-}
-
-right : ∀{X A : Set} → A → Either X A
-right x = Right x
-
-error : ∀{X A : Set} → X → Either X A
-error e = Left e
-
-_>>=E_ : ∀{X A B : Set} → Either X A → (A → Either X B) → Either X B
-_>>=E_ (Left x) f = Left x
-_>>=E_ (Right x) f = f x
-
-data TransError : Set where
-  IllformedLetPattern : TransError
-
-translate : ITerm → Either TransError Term
+translate : ITerm → Either Exception Term
 translate = translate' 0 0
  where
-   translate' : Name → Name → ITerm → Either TransError Term
+   -- n : the next fresh bound variable name
+   -- m : the next fresh bound pattern variable name
+   translate' : Name → Name → ITerm → Either Exception Term
    translate' n m Triv = right Triv
    translate' n m Void = right Void
    translate' n m (Var x) = right (FVar x)
