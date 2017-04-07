@@ -1,5 +1,7 @@
 module Utils.Exception where
 
+{-# IMPORT Utils.Exception #-}
+
 data Either (A : Set) (B : Set) : Set where
   Left : A → Either A B
   Right : B → Either A B
@@ -17,3 +19,4 @@ _>>=E_ (Right x) f = f x
 
 data Exception : Set where
   IllformedLetPattern : Exception
+{-# COMPILED_DATA Exception Utils.Exception.Exception Utils.Exception.IllformedLetPattern #-}

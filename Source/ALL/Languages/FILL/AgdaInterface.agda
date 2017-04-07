@@ -1,4 +1,4 @@
-module Languages.FILL.Translator where
+module Languages.FILL.AgdaInterface where
 
 open import nat
 
@@ -26,7 +26,7 @@ translate = translate' 0 0
          >>=E (λ e₂ → right (Par e₁ e₂)))
    translate' n m (Lam x a t) =
      (translate' (suc n) m t)
-       >>=E (λ e → right (Lam a (close-t n BV x e)))
+       >>=E (λ e → right (Lam x a (close-t n x BV x e)))
    translate' n m (Let t₁ a PTriv t₂) =
      (translate' n m t₁)
        >>=E (λ e₁ → (translate' n m t₂)
@@ -34,13 +34,31 @@ translate = translate' 0 0
    translate' n m (Let t₁ a (PTensor (PVar x) (PVar y)) t₂) =
      (translate' n (suc m) t₁)
        >>=E (λ e₁ → (translate' n (suc m) t₂)
-         >>=E (λ e₂ → right (Let e₁ a PTensor (close-t m LPV x (close-t m RPV y e₂)))))
+         >>=E (λ e₂ → right (Let e₁ a (PTensor x y) (close-t m x LPV x (close-t m y RPV y e₂)))))
    translate' n m (Let t₁ a (PPar (PVar x) (PVar y)) t₂) =
      (translate' n (suc m) t₁)
        >>=E (λ e₁ → (translate' n (suc m) t₂)
-         >>=E (λ e₂ → right (Let e₁ a PPar (close-t m LPV x (close-t m RPV y e₂)))))
+         >>=E (λ e₂ → right (Let e₁ a (PPar x y) (close-t m x LPV x (close-t m y RPV y e₂)))))
    translate' n m (Let _ _ _ _) = error IllformedLetPattern 
    translate' n m (App t₁ t₂) =
      (translate' n m t₁)
        >>=E (λ e₁ → (translate' n m t₂)
          >>=E (λ e₂ → right (App e₁ e₂)))
+
+untranslate : Term → ITerm
+untranslate Triv = Triv
+untranslate Void = Void
+untranslate (FVar x) = Var x
+untranslate (BVar _ x _) = Var x
+untranslate (Let t₁ a PTriv t₂) = Let (untranslate t₁) a PTriv (untranslate t₂)
+untranslate (Let t₁ a (PTensor xs ys) t₂) = Let (untranslate t₁) a (PTensor (PVar xs) (PVar ys)) (untranslate t₂)
+untranslate (Let t₁ a (PPar xs ys) t₂) = Let (untranslate t₁) a (PPar (PVar xs) (PVar ys)) (untranslate t₂)
+untranslate (Lam x a t) = Lam x a (untranslate t)
+untranslate (App t₁ t₂) = App (untranslate t₁) (untranslate t₂)
+untranslate (Tensor t₁ t₂) = TTensor (untranslate t₁) (untranslate t₂)
+untranslate (Par t₁ t₂) = TPar (untranslate t₁) (untranslate t₂)
+
+transUntransId : ITerm → Either Exception ITerm
+transUntransId t = (translate t) >>=E (λ e → right (untranslate e))
+
+{-# COMPILED_EXPORT transUntransId transUntransId #-}

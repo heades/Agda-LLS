@@ -7,7 +7,9 @@ LANGUAGE
 #-}
 module Languages.FILL.TypeSyntax where
 
-data Type = TVar String
+import Data.Text
+    
+data Type = TVar Text
           | Top          
           | Bottom
           | Imp Type Type

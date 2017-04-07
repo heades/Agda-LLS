@@ -5,20 +5,22 @@
 module Languages.FILL.Intermediate (ITerm(..),
                                     IPattern(..)) where
                   
+import Data.Text
+
 import Languages.FILL.TypeSyntax
 
-data ITerm = Var String
+data ITerm = Var Text
            | Triv
            | Void
            | TTensor ITerm ITerm
            | TPar ITerm ITerm
-           | Lam String Type ITerm
+           | Lam Text Type ITerm
            | Let ITerm Type IPattern ITerm
            | App ITerm ITerm
  deriving Show
         
 data IPattern = PTriv
-              | PVar String
+              | PVar Text
               | PTensor  IPattern IPattern
               | PPar    IPattern IPattern   
  deriving Show

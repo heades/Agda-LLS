@@ -4,6 +4,7 @@ module Languages.FILL.Parser.Parser where
 
 import Prelude hiding (True)
 import Data.Char
+import Data.Text
 import Text.Parsec hiding (Empty)
 import Text.Parsec.Expr
 
@@ -26,11 +27,11 @@ typeParser' = try (Tok.parens typeParser) <|> topParser <|> bottomParser <|> tyv
 
 tyvarParser = do
   x <- Tok.var
-  if isLower $ head x
+  if isLower $ Prelude.head $ x
   then fail "Type variables must begin with an uppercase letter."
   else if x `elem` reservedWords
        then fail $ x ++ " is a reserved word."
-       else return $ TVar x
+       else return $ TVar $ pack x
 
 impParser = constParser Tok.linImp Imp
 tensorParser = constParser Tok.tensor Tensor
@@ -46,11 +47,11 @@ patternParser' = try (Tok.parens patternParser) <|> try trivParser <|> pvarParse
 
 pvarParser = do
   x <- Tok.var
-  if isUpper $ head x
+  if isUpper $ Prelude.head x
   then fail "Pattern variables must begin with a lowercase letter."
   else if x `elem` reservedWords
        then fail $ x ++ " is a reserved word."
-       else return $ PVar x       
+       else return $ PVar $ pack x       
 trivParser = constParser (Tok.triv) PTriv
 ptensorParser = constParser Tok.tensor PTensor
 pparParser = constParser Tok.par PPar               
@@ -69,15 +70,15 @@ appParser = do
   t <- many aterm
   case t of
     [] -> fail "Empty application is not supported: must supply a term."
-    _ -> return $ foldl1 App t
+    _ -> return $ Prelude.foldl1 App t
              
 varParser = do
   x <- Tok.var
-  if isUpper $ head x
+  if isUpper $ Prelude.head x
   then fail "Variables must begin with a lowercase letter."
   else if x `elem` reservedWords
        then fail $ x ++ " is a reserved word."
-       else return $ Var x
+       else return $ Var $ pack x
 
 voidParser = constParser Tok.void Void             
              
@@ -88,7 +89,7 @@ lamParser = do
   ty <- typeParser
   Tok.symbol '.'
   b <- expr
-  return $ Lam x ty b
+  return $ Lam (pack x) ty b
 
 letParser = do
   Tok.leT
