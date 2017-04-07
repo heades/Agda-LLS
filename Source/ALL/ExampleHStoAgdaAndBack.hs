@@ -2,10 +2,10 @@ module ExampleHStoAgdaAndBack where
 
 import Text.Parsec hiding (Empty)    
     
-import qualified Languages.FILL.Parser.Tokenizer as Tok
-import Languages.FILL.Intermediate
-import Languages.FILL.Parser.Parser
-import MAlonzo.Code.Languages.FILL.AgdaInterface
+import qualified Languages.ILL.Parser.Tokenizer as Tok
+import Languages.ILL.Intermediate
+import Languages.ILL.Parser.Parser
+import MAlonzo.Code.Languages.ILL.AgdaInterface
 import Utils.Exception
 
 test :: String -> Either Exception ITerm
