@@ -17,6 +17,7 @@ data IPattern : Set where
                            Languages.FILL.Intermediate.PPar #-}
 
 data ITerm : Set where
+  Var : String → ITerm
   Triv : ITerm
   Void : ITerm
   TTensor : ITerm → ITerm → ITerm
@@ -25,6 +26,7 @@ data ITerm : Set where
   Let : ITerm → Type → IPattern → ITerm → ITerm
   App : ITerm → ITerm → ITerm
 {-# COMPILED_DATA ITerm Languages.FILL.Intermediate.ITerm 
+                        Languages.FILL.Intermediate.Var
                         Languages.FILL.Intermediate.Triv 
                         Languages.FILL.Intermediate.Void 
                         Languages.FILL.Intermediate.TTensor 
