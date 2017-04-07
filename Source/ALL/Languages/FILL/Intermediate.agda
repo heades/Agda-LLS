@@ -8,9 +8,9 @@ open import Languages.FILL.TypeSyntax
 data IPattern : Set where
   PTriv : IPattern
   Block : IPattern
-  PVar : String -> IPattern
-  PTensor : IPattern -> IPattern -> IPattern
-  PPar : IPattern -> IPattern -> IPattern
+  PVar : String → IPattern
+  PTensor : IPattern → IPattern → IPattern
+  PPar : IPattern → IPattern → IPattern
 {-# COMPILED_DATA IPattern Languages.FILL.Intermediate.IPattern 
                            Languages.FILL.Intermediate.PTriv 
                            Languages.FILL.Intermediate.Block 
@@ -21,11 +21,11 @@ data IPattern : Set where
 data ITerm : Set where
   Triv : ITerm
   Void : ITerm
-  TTensor : ITerm -> ITerm -> ITerm
-  TPar : ITerm -> ITerm -> ITerm
-  Lam : String -> Type -> ITerm -> ITerm
-  Let : ITerm -> Type -> IPattern -> ITerm -> ITerm
-  App : ITerm -> ITerm -> ITerm
+  TTensor : ITerm → ITerm → ITerm
+  TPar : ITerm → ITerm → ITerm
+  Lam : String → Type → ITerm → ITerm
+  Let : ITerm → Type → IPattern → ITerm → ITerm
+  App : ITerm → ITerm → ITerm
 {-# COMPILED_DATA ITerm Languages.FILL.Intermediate.ITerm 
                         Languages.FILL.Intermediate.Triv 
                         Languages.FILL.Intermediate.Void 
