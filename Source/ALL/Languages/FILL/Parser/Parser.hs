@@ -42,7 +42,7 @@ patternParser = buildExpressionParser patternTable patternParser'
  where
    patternTable = [[binOp AssocNone  ptensorParser (\d r -> PTensor d r)],
                    [binOp AssocNone  pparParser (\d r -> PPar d r)]]   
-patternParser' = try (Tok.parens patternParser) <|> try blockParser <|> trivParser <|> pvarParser
+patternParser' = try (Tok.parens patternParser) <|> try trivParser <|> pvarParser
 
 pvarParser = do
   x <- Tok.var
@@ -51,7 +51,6 @@ pvarParser = do
   else if x `elem` reservedWords
        then fail $ x ++ " is a reserved word."
        else return $ PVar x       
-blockParser = constParser (Tok.symbol '-') Block
 trivParser = constParser (Tok.triv) PTriv
 ptensorParser = constParser Tok.tensor PTensor
 pparParser = constParser Tok.par PPar               

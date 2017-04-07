@@ -7,13 +7,11 @@ open import Languages.FILL.TypeSyntax
 
 data IPattern : Set where
   PTriv : IPattern
-  Block : IPattern
   PVar : String → IPattern
   PTensor : IPattern → IPattern → IPattern
   PPar : IPattern → IPattern → IPattern
 {-# COMPILED_DATA IPattern Languages.FILL.Intermediate.IPattern 
                            Languages.FILL.Intermediate.PTriv 
-                           Languages.FILL.Intermediate.Block 
                            Languages.FILL.Intermediate.PVar 
                            Languages.FILL.Intermediate.PTensor 
                            Languages.FILL.Intermediate.PPar #-}

@@ -18,7 +18,6 @@ data ITerm = Var String
  deriving Show
         
 data IPattern = PTriv
-              | Block
               | PVar String
               | PTensor  IPattern IPattern
               | PPar    IPattern IPattern   

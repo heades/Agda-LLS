@@ -14,7 +14,7 @@ tokens :-
   let                           { \p _ -> (Let, p)           }
   in                            { \p _ -> (In, p)            }
   be                            { \p _ -> (Be, p)            }
-  [\=\+\-\*\/\(\)\.:\\]         { \p s -> (Sym (head s), p)  }
+  [\=\+\*\/\(\)\.:\\]         { \p s -> (Sym (head s), p)  }
   "-o"                          { \p _ -> (LinImp, p)        }
   "(x)"                         { \p _ -> (Tensor, p)        }
   "(+)"                         { \p _ -> (Par, p)           }
