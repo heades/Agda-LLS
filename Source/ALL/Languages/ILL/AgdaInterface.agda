@@ -8,6 +8,7 @@ open import Utils.Exception
 open import Languages.ILL.Intermediate
 open import Languages.ILL.Syntax
 open import Languages.ILL.TypeSyntax
+open import Languages.ILL.TypeCheck
 
 {-# TERMINATING #-}
 translate : ITerm → Either Exception Term
@@ -75,6 +76,6 @@ untranslate (Copy t₁ p t₂) = Copy (untranslate t₁) (fst p) (snd p) (untran
 untranslate (Discard t₁ t₂) = Discard (untranslate t₁) (untranslate t₂)
 untranslate (Derelict t) = Derelict (untranslate t)
 
-transUntransId : ITerm → Either Exception ITerm
-transUntransId t = (translate t) >>=E (λ e → right (untranslate e))
-{-# COMPILED_EXPORT transUntransId transUntransId #-}
+runTypeCheck : ITerm → Either Exception Type
+runTypeCheck it = (translate it) >>=E (λ t → typeCheck t)
+{-# COMPILED_EXPORT runTypeCheck runTypeCheck #-}

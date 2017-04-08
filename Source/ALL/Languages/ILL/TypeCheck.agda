@@ -9,10 +9,6 @@ open import Utils.HaskellTypes
 open import Utils.HaskellFunctions
 open import Utils.Exception
 
-data Unit : Set where
-  triv : Unit
-{-# COMPILED_DATA Unit () triv #-}
-
 data StateT (s : Set) (m : Set → Set) (a : Set) : Set where
   stateT : (s → m (Prod a s)) → StateT s m a
 
@@ -199,3 +195,8 @@ typeCheck' (Copy t₁ (x , y) t₂) =
  where
    t₂' = open-t 0 y RCPV (FVar y) (open-t 0 x LCPV (FVar x) t₂)
 typeCheck' (Derelict t) = typeCheck' t >>=STE isBang 
+
+typeCheck : Term → Either Exception Type
+typeCheck t with runStateT (typeCheck' t) []
+... | Left e = Left e
+... | Right (ty , _) = right ty
