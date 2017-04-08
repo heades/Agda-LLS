@@ -40,13 +40,13 @@ translate = translate' 0 0 0 0
      (translate' n m c p t₁)
        >>=E (λ e₁ → (translate' n m c p t₂)
          >>=E (λ e₂ → right (App e₁ e₂)))
-   translate' n m c p (Promote ts xs t) =
+   translate' n m c p (Promote ts t) =
       tts >>=E
       (λ ttts → (translate' n m c (suc p) t) >>=E
-        (λ tt → right (Promote ttts xs (foldr aux tt xs)) )) 
+        (λ tt → right (Promote ttts (foldr aux tt ts)) )) 
     where
-      tts = commExpList (map (translate' n m c p) ts)
-      aux = (λ (x : Prod String Type) (v : Term) → close-t p (fst x) PBV (fst x) v)
+      tts = commExpList (map (λ x → commExpTriple (fstMapT (translate' n m c p) x)) ts)
+      aux = (λ (x : Triple ITerm String Type) (v : Term) → close-t p (sndT x) PBV (sndT x) v)
    translate' n m c p (Copy t₁ x y t₂) =
      (translate' n m c p t₁) >>=E
        (λ tt₁ → (translate' n m (suc c) p t₂) >>=E
@@ -68,9 +68,9 @@ untranslate (Let t₁ a (PTensor xs ys) t₂) = Let (untranslate t₁) a (PTenso
 untranslate (Lam x a t) = Lam x a (untranslate t)
 untranslate (App t₁ t₂) = App (untranslate t₁) (untranslate t₂)
 untranslate (Tensor t₁ t₂) = TTensor (untranslate t₁) (untranslate t₂)
-untranslate (Promote ts xs t) = Promote uts xs (untranslate t)
+untranslate (Promote ts t) = Promote uts (untranslate t)
   where
-   uts = map untranslate ts
+   uts = map (fstMapT untranslate) ts
 untranslate (Copy t₁ p t₂) = Copy (untranslate t₁) (fst p) (snd p) (untranslate t₂)
 untranslate (Discard t₁ t₂) = Discard (untranslate t₁) (untranslate t₂)
 untranslate (Derelict t) = Derelict (untranslate t)

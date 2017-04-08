@@ -1,5 +1,7 @@
 module Languages.ILL.TypeSyntax where
 
+open import bool
+
 open import Utils.HaskellTypes
 
 {-# IMPORT Languages.ILL.TypeSyntax #-}
@@ -17,3 +19,11 @@ data Type : Set where
                        Languages.ILL.TypeSyntax.Imp 
                        Languages.ILL.TypeSyntax.Tensor
                        Languages.ILL.TypeSyntax.Bang #-}
+
+_eq-type_ : Type → Type → 𝔹
+(TVar _) eq-type (TVar _) = tt
+Top eq-type Top = tt
+(Imp A C) eq-type (Imp B D) = (A eq-type B) && (C eq-type D)
+(Tensor A C) eq-type (Tensor B D) = (A eq-type B) && (C eq-type D)
+(Bang A) eq-type (Bang B) = A eq-type B
+_ eq-type _ = ff

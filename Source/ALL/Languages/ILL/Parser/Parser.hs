@@ -66,6 +66,7 @@ varNameTypeParser = do
   ty <- typeParser
   return (x , ty)
 
+-- FIXME: Check that ms and xs have the same length.
 promoteParser = do
   Tok.promote
   ms <- expr `sepBy` (Tok.symbol ',')
@@ -73,7 +74,8 @@ promoteParser = do
   xs <- varNameTypeParser `sepBy` (Tok.symbol ',')
   Tok.inT
   n <- expr
-  return $ Promote ms xs n
+  let l = Prelude.zipWith (\ x y -> (x , fst y , snd y)) ms xs
+  return $ Promote l n
 
 discardParser = do
   Tok.discard

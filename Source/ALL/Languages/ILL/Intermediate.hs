@@ -17,7 +17,7 @@ data ITerm = Var IName
            | Lam IName Type ITerm
            | Let ITerm Type IPattern ITerm
            | App ITerm ITerm
-           | Promote [ITerm] [(IName,Type)] ITerm
+           | Promote [(ITerm,IName,Type)] ITerm
            | Discard ITerm ITerm
            | Copy ITerm IName IName ITerm
            | Derelict ITerm

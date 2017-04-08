@@ -22,7 +22,7 @@ data ITerm : Set where
   Lam : String → Type → ITerm → ITerm
   Let : ITerm → Type → IPattern → ITerm → ITerm
   App : ITerm → ITerm → ITerm
-  Promote : List ITerm → List (Prod String Type) → ITerm → ITerm
+  Promote : List (Triple ITerm String Type) → ITerm → ITerm
   Discard : ITerm → ITerm → ITerm
   Copy : ITerm → String → String → ITerm → ITerm
   Derelict : ITerm → ITerm
