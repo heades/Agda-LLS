@@ -11,4 +11,5 @@ data Exception = IllformedLetPattern
                | TypeErrorPromoteNotBang
                | TypeErrorTypesNotEqual
                | TypeErrorAppNotImp
+               | NonLinearCtx
  deriving Show

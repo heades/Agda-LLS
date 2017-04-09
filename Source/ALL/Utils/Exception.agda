@@ -41,6 +41,7 @@ data Exception : Set where
   TypeErrorPromoteNotBang : Exception
   TypeErrorTypesNotEqual : Exception
   TypeErrorAppNotImp : Exception
+  NonLinearCtx : Exception
 {-# COMPILED_DATA Exception Utils.Exception.Exception Utils.Exception.IllformedLetPattern 
                                                       Utils.Exception.IllformedPromote
                                                       Utils.Exception.VarNotInCtx 
@@ -51,4 +52,5 @@ data Exception : Set where
                                                       Utils.Exception.TypeErrorLetNotTensor
                                                       Utils.Exception.TypeErrorPromoteNotBang 
                                                       Utils.Exception.TypeErrorTypesNotEqual 
-                                                      Utils.Exception.TypeErrorAppNotImp #-}
+                                                      Utils.Exception.TypeErrorAppNotImp 
+                                                      Utils.Exception.NonLinearCtx #-}

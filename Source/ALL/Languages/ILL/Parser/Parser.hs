@@ -1,4 +1,5 @@
 {-# LANGUAGE NoMonomorphismRestriction #-}
+{-# LANGUAGE ViewPatterns #-}
 
 module Languages.ILL.Parser.Parser where
 
@@ -137,3 +138,107 @@ letParser = do
   Tok.inT
   t <- expr
   return $ Let a ty p t
+
+
+------------------------------------------------------------------------                 
+--                  Parsers for the REPL                              --
+------------------------------------------------------------------------        
+
+data REPLExpr =
+   RLet IName ITerm              -- Toplevel let-expression: for the REPL
+ | TypeCheck ITerm               -- Typecheck a term
+ | ShowAST ITerm                 -- Show a terms AST
+ | DumpState                     -- Trigger to dump the state for debugging.
+ | Unfold ITerm                  -- Unfold the definitions in a term for debugging.
+ | LoadFile String               -- Loading an external file into the context
+ | Eval ITerm                    -- The defualt is to evaluate.
+ | DecVar IName Type              -- Declare a free variable for testing.
+ deriving Show
+                    
+-- replLetParser = do
+--   reservedOp "let"
+--   ws
+--   n <- varName
+--   ws
+--   symbol "="
+--   ws
+--   t <- expr 
+--   eof
+--   return $ Let n t        
+
+-- replFileCmdParser short long c = do
+--   symbol ":"
+--   cmd <- many lower
+--   ws
+--   pathUntrimmed <- many1 anyChar
+--   eof
+--   if(cmd == long || cmd == short)
+--   then do
+--     -- Trim whiteSpace from path
+--     let path = T.unpack . T.strip . T.pack $ pathUntrimmed
+--     return $ c path
+--   else fail $ "Command \":"++cmd++"\" is unrecognized."
+  
+replTermCmdParser short long c p = do
+  Tok.symbol ':'
+  cmd <- varNameParser
+  t <- p       
+  eof
+  if (cmd == (pack long) || cmd == (pack short))
+  then return $ c t
+  else fail $ "Command \":"++(n2s cmd)++"\" is unrecognized."
+  
+-- repl2TermCmdParser short long c p = do
+--   symbol ":"
+--   cmd <- many lower
+--   ws 
+--   vname <- varName
+--   ws
+--   symbol ":"
+--   ws
+--   ty <- p
+--   eof
+--   if (cmd == long || cmd == short)
+--   then return $ c vname ty
+--   else fail $ "Command \":"++cmd++"\" is unrecognized."
+
+replIntCmdParser short long c = do
+  Tok.symbol ':'
+  cmd <- varNameParser
+  eof
+  if (cmd == long || cmd == short)
+  then return c
+  else fail $ "Command \":"++(n2s cmd)++"\" is unrecognized." 
+
+evalParser = do
+  t <- expr
+  return $ Eval t
+
+typeCheckParser = replTermCmdParser "t" "type" TypeCheck expr
+
+showASTParser = replTermCmdParser "s" "show" ShowAST expr
+
+-- unfoldTermParser = replTermCmdParser "u" "unfold" Unfold expr                
+
+-- dumpStateParser = replIntCmdParser "d" "dump" DumpState
+
+-- loadFileParser = replFileCmdParser "l" "load" LoadFile
+
+-- decvarParser = repl2TermCmdParser "dv" "decvar" DecVar typeParser
+               
+-- lineParser = try letParser
+--           <|> try loadFileParser
+--           <|> try decvarParser
+--           <|> try typeCheckParser
+--           <|> try showASTParser
+--           <|> try unfoldTermParser
+--           <|> try dumpStateParser
+--           <|> evalParser
+
+lineParser = try typeCheckParser
+          <|> try showASTParser
+
+parseLine :: String -> Either String REPLExpr
+parseLine (Tok.getTokens -> s) = case (parse lineParser "" s) of
+                Left msg -> Left $ show msg
+                Right l -> Right l                 

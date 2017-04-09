@@ -2,8 +2,7 @@
 -- Haskell front end to the Agda back end.  Both sides must
 -- implement these data types.
 
-module Languages.ILL.Intermediate (ITerm(..),
-                                    IPattern(..)) where
+module Languages.ILL.Intermediate where
                   
 import Data.Text
 
@@ -28,3 +27,5 @@ data IPattern = PTriv
               | PTensor  IPattern IPattern
  deriving Show
         
+n2s :: IName -> String
+n2s = unpack

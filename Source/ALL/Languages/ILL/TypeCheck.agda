@@ -119,9 +119,10 @@ typeCheck' Triv = get >>=STE checkCTX
 typeCheck' (FVar x) = get >>=STE checkCtx
  where
    checkCtx : CTX → TC Type
-   checkCtx ctx with getTypeCTX x ctx
-   ... | just ty = returnSTE ty
-   ... | nothing = throw VarNotInCtx
+   checkCtx ((y , ty) :: []) with x str-eq y
+   ... | tt = returnSTE ty
+   ... | ff = throw VarNotInCtx
+   checkCtx _ = throw NonLinearCtx
 typeCheck' (BVar _ _ _) = throw NonlocallyClosed
 typeCheck' (Let t₁ ty PTriv t₂) = 
  get >>=STE
@@ -142,7 +143,8 @@ typeCheck' (Let t₁ ty (PTensor x y) t₂) =
 typeCheck' (Lam x ty t) =
   get >>=STE
     (λ ctx → (put ((x , ty) :: ctx)) >>STE
-      typeCheck' (open-t 0 x BV (FVar x) t))
+      typeCheck' (open-t 0 x BV (FVar x) t) >>=STE
+        (λ ty₂ → returnSTE (Imp ty ty₂)))
 typeCheck' (App t₁ t₂) =
   get >>=STE
     (λ ctx → lift (subctxFV ctx t₁) >>=STE
