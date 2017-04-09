@@ -48,8 +48,19 @@ foldr : {A : Set}{B : Set} → (A → B → B) → B → List A → B
 foldr f b [] = b
 foldr f b (a :: as) = f a (foldr f b as)
 
+foldl : {A : Set}{B : Set} → (B → A → B) → B → List A → B
+foldl f b [] = b
+foldl f b (x :: xs) = foldl f (f b x) xs
+
 lookup : ∀{A B} → (A → A → 𝔹) → A → List (Prod A B) → maybe B
 lookup _eq_ x [] = nothing
 lookup _eq_ x ((y , b) :: l) with x eq y
 ... | tt = just b
 ... | ff = lookup _eq_ x l
+
+disjoint : {A : Set} → (A → A → 𝔹) → List A → List A → 𝔹
+disjoint _eq_ (x :: l₁) (y :: l₂) with x eq y
+... | tt = ff
+... | ff = disjoint _eq_ l₁ l₂
+disjoint _ [] _ = tt
+disjoint _ _ [] = tt

@@ -39,11 +39,22 @@ get = stateT (λ x → right (x , x))
 put : ∀{S} → S → StateT S (Either Exception) Unit
 put s = stateT (λ x → Right (triv , s))
 
+CTXEl : Set
+CTXEl = Prod String Type
+
 CTX : Set
-CTX = List (Prod String Type)
+CTX = List CTXEl
+
+CTXV-eq : CTXEl → CTXEl → 𝔹
+CTXV-eq (x , ty) (y , ty') = x str-eq y
 
 TC : Set → Set
 TC = StateT CTX (Either Exception)
+
+_isDisjointWith_ : CTX → CTX → TC Unit
+ctx₁ isDisjointWith ctx₂ with disjoint CTXV-eq ctx₁ ctx₂
+... | tt = returnSTE triv
+... | ff = throw TypeErrorDuplicatedFreeVar
 
 getTypeCTX : String → CTX → maybe Type
 getTypeCTX x ctx = lookup _str-eq_ x ctx
@@ -128,18 +139,22 @@ typeCheck' (Let t₁ ty PTriv t₂) =
  get >>=STE
    (λ ctx → lift (subctxFV ctx t₁) >>=STE
      (λ ctx₁ → lift (subctxFV ctx t₂) >>=STE
-       λ ctx₂ → ((put ctx₁) >>STE typeCheck' t₁) >>=STE
-         (λ ty₁ → isTop ty₁ >>STE (put ctx₂ >>STE typeCheck' t₂))))
+       λ ctx₂ → (ctx₁ isDisjointWith ctx₂) >>STE
+         ((put ctx₁) >>STE typeCheck' t₁) >>=STE
+           (λ ty₁ → isTop ty₁ >>STE
+             (put ctx₂ >>STE typeCheck' t₂))))
 typeCheck' (Let t₁ ty (PTensor x y) t₂) =
   get >>=STE
     (λ ctx → lift (subctxFV ctx t₁) >>=STE
      (λ ctx₁ → lift (subctxFV ctx t₂) >>=STE
-      (λ ctx₂ → ((put ctx₁) >>STE typeCheck' t₁) >>=STE
-       (λ ty₁ → (isTensor ty₁) >>=STE
-        (λ tys → let A = fst tys
-                     B = snd tys
-                     t₂' = open-t 0 y RLPV (FVar y) (open-t 0 x LLPV (FVar x) t₂)
-                  in put ((x , A) :: (y , B) :: ctx₂) >>STE typeCheck' t₂')))))       
+      (λ ctx₂ → (ctx₁ isDisjointWith ctx₂) >>STE
+        ((put ctx₁) >>STE
+          typeCheck' t₁) >>=STE
+            (λ ty₁ → (isTensor ty₁) >>=STE
+              (λ tys → let A = fst tys
+                           B = snd tys
+                           t₂' = open-t 0 y RLPV (FVar y) (open-t 0 x LLPV (FVar x) t₂)
+                        in put ((x , A) :: (y , B) :: ctx₂) >>STE typeCheck' t₂')))))       
 typeCheck' (Lam x ty t) =
   get >>=STE
     (λ ctx → (put ((x , ty) :: ctx)) >>STE
@@ -148,23 +163,43 @@ typeCheck' (Lam x ty t) =
 typeCheck' (App t₁ t₂) =
   get >>=STE
     (λ ctx → lift (subctxFV ctx t₁) >>=STE
-      (λ ctx₁ → (put ctx₁) >>STE (typeCheck' t₁) >>=STE
-        (λ ty₁ → isImp ty₁ >>=STE
-          (λ tys → lift (subctxFV ctx t₂) >>=STE
-            (λ ctx₂ → (put ctx₂) >>STE (typeCheck' t₂) >>=STE
-              (λ ty₂ → ((fst tys) tyEq ty₂) >>STE returnSTE (snd tys)))))))
+      (λ ctx₁ → lift (subctxFV ctx t₂) >>=STE
+        (λ ctx₂ → (ctx₁ isDisjointWith ctx₂) >>STE
+          (put ctx₁) >>STE (typeCheck' t₁) >>=STE
+            (λ ty₁ → isImp ty₁ >>=STE
+              (λ tys → (put ctx₂) >>STE (typeCheck' t₂) >>=STE
+                (λ ty₂ → ((fst tys) tyEq ty₂) >>STE returnSTE (snd tys)))))))
 typeCheck' (Tensor t₁ t₂) =
   get >>=STE
     (λ ctx → lift (subctxFV ctx t₁) >>=STE
-      (λ ctx₁ → (put ctx₁) >>STE typeCheck' t₁) >>=STE
-        (λ ty₁ → lift (subctxFV ctx t₂) >>=STE
-          (λ ctx₂ → (put ctx₂) >>STE typeCheck' t₂) >>=STE
-            (λ ty₂ → returnSTE (Tensor ty₁ ty₂))))
+      (λ ctx₁ → lift (subctxFV ctx t₂) >>=STE
+        (λ ctx₂ → (ctx₁ isDisjointWith ctx₂) >>STE
+          (put ctx₁) >>STE typeCheck' t₁ >>=STE
+            (λ ty₁ → (put ctx₂) >>STE typeCheck' t₂ >>=STE
+              (λ ty₂ → returnSTE (Tensor ty₁ ty₂))))))
 typeCheck' (Promote ms t) =
-  put [] >>STE checkVectorOpenTerm ms t
+  put [] >>STE getSubctxs ms
+         >>=STE areDisjointCtxs
+         >>STE checkVectorOpenTerm ms t
          >>=STE typeCheck'
          >>=STE (λ ty → returnSTE (Bang ty))
  where
+   getSubctxs : List (Triple Term String Type) → TC (List CTX)
+   getSubctxs ((triple t _ _) :: rest) =
+     get >>=STE
+       (λ ctx → (lift (subctxFV ctx t)) >>=STE
+         (λ ctx' → (getSubctxs rest) >>=STE
+           (λ r → returnSTE (ctx' :: r))))
+   getSubctxs l = returnSTE []  
+
+   areDisjointCtxs : List CTX → TC Unit
+   areDisjointCtxs [] = returnSTE triv
+   areDisjointCtxs (ctx₁ :: rest) = aux ctx₁ rest >>STE areDisjointCtxs rest
+     where
+       aux : CTX → List CTX → TC Unit
+       aux ctx₁ (ctx₂ :: rest) = (ctx₁ isDisjointWith ctx₂) >>STE aux ctx₁ rest
+       aux _ [] = returnSTE triv
+
    checkVectorTerm : Term → TC Type
    checkVectorTerm t =
      get >>=STE
@@ -184,16 +219,19 @@ typeCheck' (Promote ms t) =
 typeCheck' (Discard t₁ t₂) = get >>=STE
    (λ ctx → lift (subctxFV ctx t₁) >>=STE
      (λ ctx₁ → lift (subctxFV ctx t₂) >>=STE
-       (λ ctx₂ → (put ctx₁) >>STE typeCheck' t₁
-                            >>=STE isBang
-                            >>STE (put ctx₂)
-                            >>STE typeCheck' t₂)))
+       (λ ctx₂ → (ctx₁ isDisjointWith ctx₂) >>STE
+         (put ctx₁) >>STE typeCheck' t₁
+                    >>=STE isBang
+                    >>STE (put ctx₂)
+                    >>STE typeCheck' t₂)))
 typeCheck' (Copy t₁ (x , y) t₂) =
   get >>=STE
        (λ ctx → lift (subctxFV ctx t₁) >>=STE
-         (λ ctx₁ → (put ctx₁) >>STE typeCheck' t₁ >>=STE
-           (λ ty₁ → isBang ty₁ >>STE lift (subctxFV ctx t₂) >>=STE
-             (λ ctx₂ → (put ((x , ty₁) :: (y , ty₁) :: ctx₂) >>STE typeCheck' t₂')))))
+         (λ ctx₁ → lift (subctxFV ctx t₂) >>=STE
+           (λ ctx₂ → (ctx₁ isDisjointWith ctx₂) >>STE
+             (put ctx₁) >>STE typeCheck' t₁ >>=STE
+               (λ ty₁ → isBang ty₁ >>STE
+                 (put ((x , ty₁) :: (y , ty₁) :: ctx₂) >>STE typeCheck' t₂')))))
  where
    t₂' = open-t 0 y RCPV (FVar y) (open-t 0 x LCPV (FVar x) t₂)
 typeCheck' (Derelict t) = typeCheck' t >>=STE isBang 

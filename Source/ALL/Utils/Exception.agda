@@ -42,6 +42,7 @@ data Exception : Set where
   TypeErrorTypesNotEqual : Exception
   TypeErrorAppNotImp : Exception
   NonLinearCtx : Exception
+  TypeErrorDuplicatedFreeVar : Exception
 {-# COMPILED_DATA Exception Utils.Exception.Exception Utils.Exception.IllformedLetPattern 
                                                       Utils.Exception.IllformedPromote
                                                       Utils.Exception.VarNotInCtx 
@@ -53,4 +54,5 @@ data Exception : Set where
                                                       Utils.Exception.TypeErrorPromoteNotBang 
                                                       Utils.Exception.TypeErrorTypesNotEqual 
                                                       Utils.Exception.TypeErrorAppNotImp 
-                                                      Utils.Exception.NonLinearCtx #-}
+                                                      Utils.Exception.NonLinearCtx 
+                                                      Utils.Exception.TypeErrorDuplicatedFreeVar #-}

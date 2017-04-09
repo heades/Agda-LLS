@@ -16,15 +16,17 @@ import qualified Languages.ILL.Parser.Tokenizer as Tok
 constParser p c = p >> return c
 
 binOp assoc op f = Text.Parsec.Expr.Infix (do{ op;return f}) assoc
+prefixOp op f = Text.Parsec.Expr.Prefix (do{ op;return f})
 
 reservedWords = ["Top", "let", "in", "be", "triv", "discard",
                  "of", "copy", "derelicit", "as", "promote", "for"]
                                                            
 typeParser = buildExpressionParser typeTable typeParser'
  where
-   typeTable = [[binOp AssocNone  tensorParser (\d r -> Tensor d r)],
+   typeTable = [[prefixOp bangParser (\r -> Bang r)],
+                [binOp AssocNone  tensorParser (\d r -> Tensor d r)],
                 [binOp AssocRight impParser (\d r -> Imp d r)]]
-typeParser' = try (Tok.parens typeParser) <|> topParser <|> bangParser <|> tyvarParser
+typeParser' = try (Tok.parens typeParser) <|> topParser <|> tyvarParser
 
 tyvarParser = do
   x <- Tok.var
@@ -37,7 +39,7 @@ tyvarParser = do
 impParser = constParser Tok.linImp Imp
 tensorParser = constParser Tok.tensor Tensor
 topParser = constParser Tok.top Top
-bangParser = (Tok.symbol '!') >> typeParser >>= (\ty -> return $ Bang ty)
+bangParser = constParser (Tok.symbol '!') Bang
 
 patternParser = try (Tok.parens patternParser) <|> try ptrivParser <|> ptensorParser <|> pvarParser
                 

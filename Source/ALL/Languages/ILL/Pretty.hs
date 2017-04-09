@@ -8,17 +8,14 @@ import Languages.ILL.Intermediate
 parenType :: (Type -> String) -> Type -> String
 parenType f t@(Imp _ _) = "(" ++ f t ++ ")"
 parenType f t@(Tensor _ _) = "(" ++ f t ++ ")"
-parenType f t@(Bang _) = "(" ++ f t ++ ")"                             
 parenType f t = f t
 
 parenITType :: (Type -> String) -> Type -> String
 parenITType f t@(Tensor _ _) = "(" ++ f t ++ ")"
-parenITType f t@(Bang _) = "(" ++ f t ++ ")"                             
 parenITType f t = f t
 
 parenTType :: (Type -> String) -> Type -> String
 parenTType f t@(Imp _ _) = "(" ++ f t ++ ")"
-parenTType f t@(Bang _) = "(" ++ f t ++ ")"                             
 parenTType f t = f t
 
 parenBType :: (Type -> String) -> Type -> String

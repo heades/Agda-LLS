@@ -244,7 +244,7 @@ repl = do
    where 
        loop :: InputT REPLStateIO ()
        loop = do           
-           minput <- getInputLine "ALL> "
+           minput <- getInputLine "ILL> "
            case minput of
                Nothing -> return ()
                Just [] -> loop

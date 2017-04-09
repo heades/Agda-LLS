@@ -12,4 +12,5 @@ data Exception = IllformedLetPattern
                | TypeErrorTypesNotEqual
                | TypeErrorAppNotImp
                | NonLinearCtx
+               | TypeErrorDuplicatedFreeVar
  deriving Show
