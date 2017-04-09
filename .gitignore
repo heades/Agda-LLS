@@ -6,3 +6,4 @@
 /Source/ALL/Languages/FILL/.#TypeSyntax.hs
 *.agdai
 Source/ALL/MAlonzo/*
+/Source/ALL/Languages/ILL/Parser/Token.hs
