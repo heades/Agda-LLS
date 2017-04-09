@@ -249,7 +249,7 @@ repl = do
                Nothing -> return ()
                Just [] -> loop
                Just input | input == ":q" || input == ":quit"
-                              -> liftIO $ putStrLn "Leaving ALL." >> return ()
+                              -> liftIO $ putStrLn "Leaving ILL" >> return ()
                           | input == ":h" || input == ":help"
                               -> (liftIO $ putStrLn helpMenu) >> loop                                 
                           | otherwise -> (lift.handleCMD $ input) >> loop
