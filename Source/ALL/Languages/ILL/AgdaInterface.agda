@@ -44,7 +44,7 @@ translate (Promote ts t) =
 translate (Copy t₁ x y t₂) =
   (translate t₁) >>=E
     (λ tt₁ → (translate t₂) >>=E
-      (λ tt₂ → Right (close-t 0 x LCPV x (close-t 0 y RCPV y tt₂))))
+      (λ tt₂ → right (Copy tt₁ (x , y) (close-t 0 x LCPV x (close-t 0 y RCPV y tt₂)))))
 translate (Discard t₁ t₂) =
   (translate t₁) >>=E
     (λ tt₁ → translate t₂ >>=E
