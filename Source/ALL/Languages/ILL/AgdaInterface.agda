@@ -12,52 +12,45 @@ open import Languages.ILL.TypeCheck
 
 {-# TERMINATING #-}
 translate : ITerm → Either Exception Term
-translate = translate' 0 0 0 0
+translate Triv = right Triv
+translate (Var x) = right (FVar x)
+translate (TTensor t₁ t₂) =
+   (translate t₁)
+     >>=E (λ e₁ → (translate t₂)
+       >>=E (λ e₂ → right (Tensor e₁ e₂)))
+translate (Lam x a t) =
+  (translate t)
+    >>=E (λ e → right (Lam x a (close-t 0 x BV x e)))
+translate (Let t₁ a PTriv t₂) =
+  (translate t₁)
+    >>=E (λ e₁ → (translate t₂)
+      >>=E (λ e₂ → right (Let e₁ a PTriv e₂)))
+translate (Let t₁ a (PTensor (PVar x) (PVar y)) t₂) =
+  (translate t₁)
+    >>=E (λ e₁ → (translate t₂)
+      >>=E (λ e₂ → right (Let e₁ a (PTensor x y) (close-t 0 x LLPV x (close-t 0 y RLPV y e₂)))))
+translate (Let _ _ _ _) = error IllformedLetPattern 
+translate (App t₁ t₂) =
+  (translate t₁)
+    >>=E (λ e₁ → (translate t₂)
+      >>=E (λ e₂ → right (App e₁ e₂)))
+translate (Promote ts t) =
+   tts >>=E
+   (λ ttts → (translate t) >>=E
+     (λ tt → right (Promote ttts (foldr aux tt ts)) )) 
  where
-   -- n : the next fresh λ-bound variable name
-   -- m : the next fresh let-bound pattern variable name
-   -- c : the next fresh copy-bound variable name
-   -- p : the next fresh promote-bound variable name
-   translate' : Name → Name → Name → Name → ITerm → Either Exception Term
-   translate' n m c p Triv = right Triv
-   translate' n m c p (Var x) = right (FVar x)
-   translate' n m c p (TTensor t₁ t₂) =
-     (translate' n m c p t₁)
-       >>=E (λ e₁ → (translate' n m c p t₂)
-         >>=E (λ e₂ → right (Tensor e₁ e₂)))
-   translate' n m c p (Lam x a t) =
-     (translate' (suc n) m c p t)
-       >>=E (λ e → right (Lam x a (close-t n x BV x e)))
-   translate' n m c p (Let t₁ a PTriv t₂) =
-     (translate' n m c p t₁)
-       >>=E (λ e₁ → (translate' n m c p t₂)
-         >>=E (λ e₂ → right (Let e₁ a PTriv e₂)))
-   translate' n m c p (Let t₁ a (PTensor (PVar x) (PVar y)) t₂) =
-     (translate' n m c p t₁)
-       >>=E (λ e₁ → (translate' n (suc m) c p t₂)
-         >>=E (λ e₂ → right (Let e₁ a (PTensor x y) (close-t m x LLPV x (close-t m y RLPV y e₂)))))
-   translate' n m c p (Let _ _ _ _) = error IllformedLetPattern 
-   translate' n m c p (App t₁ t₂) =
-     (translate' n m c p t₁)
-       >>=E (λ e₁ → (translate' n m c p t₂)
-         >>=E (λ e₂ → right (App e₁ e₂)))
-   translate' n m c p (Promote ts t) =
-      tts >>=E
-      (λ ttts → (translate' n m c (suc p) t) >>=E
-        (λ tt → right (Promote ttts (foldr aux tt ts)) )) 
-    where
-      tts = commExpList (map (λ x → commExpTriple (fstMapT (translate' n m c p) x)) ts)
-      aux = (λ (x : Triple ITerm String Type) (v : Term) → close-t p (sndT x) PBV (sndT x) v)
-   translate' n m c p (Copy t₁ x y t₂) =
-     (translate' n m c p t₁) >>=E
-       (λ tt₁ → (translate' n m (suc c) p t₂) >>=E
-         (λ tt₂ → Right (close-t c x LCPV x (close-t c y RCPV y tt₂))))
-   translate' n m c p (Discard t₁ t₂) =
-     (translate' n m c p t₁) >>=E
-       (λ tt₁ → translate' n m c p t₂ >>=E
-         (λ tt₂ → right (Discard tt₁ tt₂)))
-   translate' n m c p (Derelict t) =
-     (translate' n m c p t) >>=E (λ tt → right (Derelict tt))
+   tts = commExpList (map (λ x → commExpTriple (fstMapT translate x)) ts)
+   aux = (λ (x : Triple ITerm String Type) (v : Term) → close-t 0 (sndT x) PBV (sndT x) v)
+translate (Copy t₁ x y t₂) =
+  (translate t₁) >>=E
+    (λ tt₁ → (translate t₂) >>=E
+      (λ tt₂ → Right (close-t 0 x LCPV x (close-t 0 y RCPV y tt₂))))
+translate (Discard t₁ t₂) =
+  (translate t₁) >>=E
+    (λ tt₁ → translate t₂ >>=E
+      (λ tt₂ → right (Discard tt₁ tt₂)))
+translate (Derelict t) =
+  (translate t) >>=E (λ tt → right (Derelict tt))
 
 {-# TERMINATING #-}
 untranslate : Term → ITerm
